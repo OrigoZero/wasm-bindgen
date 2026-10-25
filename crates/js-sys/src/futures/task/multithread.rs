@@ -6,6 +6,7 @@ use alloc::sync::Arc;
 use core::cell::RefCell;
 use core::future::Future;
 use core::mem::ManuallyDrop;
+use core::panic::AssertUnwindSafe;
 use core::pin::Pin;
 use core::sync::atomic::AtomicI32;
 use core::sync::atomic::Ordering::SeqCst;
@@ -98,7 +99,13 @@ impl Task {
         });
 
         let closure = {
-            let this = Rc::clone(&this);
+            // `Closure::new` asks for an unwind-safe capture when the crate is
+            // built with `-C panic=unwind`, and an `Rc<Task>` holding a
+            // `RefCell` is not one. `run` takes that cell itself and gives it
+            // back on every path out of it, so a panic crossing this closure
+            // leaves the task the way an early return does. `queue.rs` states
+            // the same thing about its own capture.
+            let this = AssertUnwindSafe(Rc::clone(&this));
             Closure::new(move |_| {
                 // The promise resolution acts like a wake, so ensure the state
                 // transitions to AWAKE before entering `run`.
