@@ -29,7 +29,12 @@ mod server;
 mod shell;
 
 #[derive(Parser)]
-#[command(name = "wasm-bindgen-test-runner", version, about, long_about = None)]
+#[command(
+    name = "wasm-bindgen-test-runner",
+    version = env!("WASM_BINDGEN_CLI_VERSION"),
+    about,
+    long_about = None
+)]
 struct Cli {
     #[arg(
         index = 1,

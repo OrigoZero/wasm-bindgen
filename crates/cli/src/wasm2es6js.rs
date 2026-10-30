@@ -7,7 +7,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(
     name = "wasm2es6js",
-    version,
+    version = env!("WASM_BINDGEN_CLI_VERSION"),
     about,
     long_about = None,
     after_help = "Note that this is not intended to produce a production-ready output module but rather\n\

@@ -19,7 +19,7 @@ enum Target {
 #[derive(Debug, Parser)]
 #[command(
     name = "wasm-bindgen",
-    version,
+    version = env!("WASM_BINDGEN_CLI_VERSION"),
     about,
     after_help = "Additional documentation: https://wasm-bindgen.github.io/wasm-bindgen/reference/cli.html"
 )]
