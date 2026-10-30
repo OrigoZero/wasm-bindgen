@@ -143,6 +143,13 @@ members = [
 resolver = "2"
 
 [patch.crates-io]
+# walrus from the OrigoZero/walrus fork, branch `zero`: the 0.26.2 release with
+# three changes to what it holds per parsed instruction (56 bytes for an
+# instruction and its location where 0.26.2 holds 96, no growth slack kept in a
+# finished sequence, and no DWARF bookkeeping for a module carrying no DWARF).
+# wasm-bindgen-test-runner parses every test artifact with walrus, and held
+# 4060 MiB for a 63 MB module through 0.26.2 and 1403 MiB through this commit.
+walrus = { git = "https://github.com/OrigoZero/walrus", rev = "eca8f7b1bc1dbfdb0c6d70ed5bd324f6542aa218" }
 js-sys = { path = 'crates/js-sys' }
 wasm-bindgen = { path = '.' }
 wasm-bindgen-futures = { path = 'crates/futures' }
