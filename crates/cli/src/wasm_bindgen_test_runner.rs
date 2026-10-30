@@ -143,16 +143,19 @@ fn rmain(cli: Cli) -> anyhow::Result<()> {
     if file_name_buf.extension().unwrap_or_default() == "js" {
         file_name_buf.set_extension("wasm");
     }
-    let wasm = fs::read(file_name_buf).context("failed to read Wasm file")?;
-    let uses_memory64 = module_uses_memory64(&wasm)?;
+    let bytes = fs::read(file_name_buf).context("failed to read Wasm file")?;
+    let uses_memory64 = module_uses_memory64(&bytes)?;
     let mut wasm = walrus::ModuleConfig::new()
         // Generate DWARF by default so the test runner preserves debug info for
         // ordinary wasm32 test binaries. Walrus 0.26 currently overflows while
         // remapping DWARF addresses for memory64 modules, so skip DWARF
         // generation for wasm64 inputs until upstream supports them.
         .generate_dwarf(!uses_memory64)
-        .parse(&wasm)
+        .parse(&bytes)
         .context("failed to deserialize Wasm module")?;
+    // The module is all the run reads from here on; the file's bytes would
+    // otherwise stay resident until the browser run is over.
+    drop(bytes);
     let mut tests = Tests::new();
 
     // benchmark or test
